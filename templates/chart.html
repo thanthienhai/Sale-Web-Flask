@@ -43,13 +43,20 @@
 			</div>
 		</nav>
     <!-- This is where your Plotly chart will be displayed -->
+    
     <div id="plotly-chart"></div>
+    <div id="plotly-chart_2"></div>
 </div>
 
 <script>
     // Embed the Plotly chart in the HTML div
     var chart_div = document.getElementById('plotly-chart');
     chart_div.innerHTML = '{{ chart_div|safe }}';
+</script>
+<script>
+    // Embed the Plotly chart in the HTML div
+    var chart_div = document.getElementById('plotly-chart2');
+    chart_div.innerHTML = '{{ chart_div2|safe }}';
 </script>
 
 </body>

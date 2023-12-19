@@ -35,13 +35,28 @@
             </ul>
         </div>
     </nav>
-
+  
     <div class="container-fluid mt-4 main-table">
         {{ table|safe }}
     </div>
-
+    
+    <div class="container-fluid mt-4 main-table">
+        {{ table_2|safe }}
+    </div>
+    
+    <!-- This is where your Plotly chart will be displayed -->
+    <div id="plotly-chart"></div>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    // Embed the Plotly chart in the HTML div
+    var chart_div = document.getElementById('plotly-chart');
+    chart_div.innerHTML = '{{ chart_div|safe }}';
+</script>
+
+
 </body>
 </html>
