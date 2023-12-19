@@ -1,0 +1,34 @@
+{% extends "base.html" -%}
+{% block header -%}
+{% include "partials/menu.html" %}
+{%- endblock header %}
+{% block content -%}
+<style>
+	#values_goodOrPoor{
+		color: green;
+		font-weight: bold;
+	}
+</style>
+<div>
+	"Độ hài lòng của khách hàng: " <div id="values_goodOrPoor">{{data}}</div>
+</div>
+<div style="
+        width: 100%;
+        height: 100vh;
+        display: flex;
+      ">
+    <div style="width: 60%; height: 100%;">
+        <div style="width: 100%; height: 50%;">
+            {{ table_1|safe }}
+        </div>
+        <div style="width: 100%; height: 50%;">
+            {{ table_2|safe }}
+        </div>
+    </div>
+    <div style="width: 40%; height: 100%; display: table;">
+        <div style="width: 100%; height: 100%; display: table-cell; vertical-align: middle; text-align: center;">
+            {{ table_3|safe }}
+        </div>
+    </div>
+</div>
+{%- endblock content %}
