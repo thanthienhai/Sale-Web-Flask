@@ -3,14 +3,6 @@
 {% include "partials/menu.html" %}
 {%- endblock header %}
 {% block content -%}
-<!--
-<div style="width: 100%; height: 50%;">
-    {{ table_1|safe }}
-</div>
-<div>
-    {{ table_2|safe }}
-</div>
--->
 <style>
     .main-table {
         background-color: #f8f9fa;
@@ -43,28 +35,24 @@
 </style>
 <div style="
         width: 100%;
-        height: 100vh;
+        height: auto;
         display: flex;
       ">
-    <div style="width: 70%; height: 100%;">
+    <div style="width: 50%; height: 100%;">
         <div style="width: 100%; height: auto;">
-            {{ table_1|safe }}
-        </div>
-        <div style="width: 100%; height: auto;">
-            {{ table_2|safe }}
+            <div class="container-fluid mt-4 main-table">
+                {{ table_1|safe }}
+            </div>
         </div>
     </div>
-    <div style="width: 30%; height: 100%; display: table; padding-right: 15px;">
-        <div style="width: 100%; height: 100%; display: table-cell; vertical-align: middle; text-align: center;">
-            <h3 style="padding-left: 15px; padding-top: 10px; ">Mức độ hài lòng của khách hàng:  <span style="color: green; font-weight: bold">{{data}}</span></h3>
+    <div style="width: 50%; height: 100%; display: table; padding-right: 15px;">
+        <div style="width: 100%; height: auto;">
             <div class="container-fluid mt-4 main-table">
-                {{ city_min|safe }}
-            </div>
-            
-            <div class="container-fluid mt-4 main-table">
-                {{ city_max|safe }}
+                {{ table_2|safe }}
             </div>
         </div>
     </div>
 </div>
+<br>
+<h3 style="padding-left: 15px; padding-top: 10px; text-align: center;">Sales forecast is:  <span style="background: white; padding: 5px; font-weight: bold;">{{ total_sales }}</span></h3>
 {%- endblock content %}

@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from flask import Flask, render_template, request
+import calendar
 
 from plot import *
 
@@ -10,6 +11,11 @@ app.config['UPLOAD_FOLDER'] = 'userUpload'
 
 csv_file_path = 'data.csv' 
 df_origin = pd.read_csv(csv_file_path)
+csv_file_path_chuanhoa = 'data_1.csv' 
+df_chuanhoa = pd.read_csv(csv_file_path_chuanhoa)
+csv_file_path_predict = 'data_predict.csv' 
+df_predict = pd.read_csv(csv_file_path_predict)
+#-------------------------------
 
 @app.route('/')
 def index():
@@ -54,27 +60,67 @@ def kh_button():
     table_2 = bar_chart(df_origin.copy(), 'Customer type', 'Quantity', 'City', 'count')
     table_3 = pie_chart(df_origin.copy(), 'Gender', 'Quantity', 'count')
     d = df_origin.describe().T
-    if(d.iloc[-1,1]>5.0):
-        data = "Good"
+    if d.iloc[-1, 1] > 5.0:
+        data = {"status": "Good", "color": "green"}
     else:
-        data = "Poor"
+        data = {"status": "Poor", "color": "red"}
     return render_template('customer_analytic.html', table_1=table_1, table_2=table_2, table_3=table_3, data=data)
 
 
 @app.route('/tg_button')
 def tg_button():
-    table_1 = line_chart(df_origin.copy(), 'City', 'Total', 'mean')
-    return render_template('time_analytic.html', table_1=table_1)
+
+    table_1 = line_chart(df_chuanhoa.copy(), 'TimeOfTheDay', 'Total', 'mean')
+    table_2 = line_chart_group(df_chuanhoa.copy(), 'TimeOfTheDay', 'Total', 'City', 'mean')
+    max_index = df_chuanhoa['Total'].idxmax()
+    max_time_of_the_day = df_chuanhoa.loc[max_index, 'TimeOfTheDay']
+    df_chuanhoa['Time'] = pd.to_datetime(df_chuanhoa['Time'])
+    df_chuanhoa['Hour'] = df_chuanhoa['Time'].dt.hour
+
+    # Nhóm dữ liệu theo cặp 'City' và 'Time', tính tổng số lượng bán
+    grouped_df = df_chuanhoa.groupby(['City', 'Time']).sum().reset_index()
+
+    # Tìm giờ bán nhiều nhất và ít nhất cho mỗi thành phố
+    max_sales_idx = grouped_df.groupby('City')['Total'].idxmax()
+    min_sales_idx = grouped_df.groupby('City')['Total'].idxmin()
+
+    max_sales_time = grouped_df.loc[max_sales_idx, ['City', 'Hour', 'Total']]
+    min_sales_time = grouped_df.loc[min_sales_idx, ['City', 'Hour', 'Total']]
+
+    return render_template('time_analytic.html', table_1=table_1, table_2=table_2, data=max_time_of_the_day, 
+                            city_min=min_sales_time.to_html(classes='table table-striped', border=0, justify='unset', col_space=0), 
+                            city_max=max_sales_time.to_html(classes='table table-striped', border=0, justify='unset', col_space=0))
 
 
 @app.route('/ch_button')
 def ch_button():
-    return "Button 4 clicked!"
+    df_chuanhoa['Date'] = pd.to_datetime(df_chuanhoa['Date'])
+    df_chuanhoa['Month'] = df_chuanhoa['Date']
+    df_sorted = df_chuanhoa.sort_values(by='Month')
+    df_sorted['Month'] = df_sorted['Month'].dt.month_name()
+    print(df_sorted)
+    table_1 = line_chart(df_sorted.copy(), 'Month', 'Total', 'mean')
+    table_2 = bar_chart(df_origin.copy(), 'Product line', 'Total', 'City', 'mean')
+    #----------------------------
+    grouped_data = df_origin.groupby(['City', 'Product line'])['Total'].sum().reset_index()
+    max_total_per_city = grouped_data.loc[grouped_data.groupby('City')['Total'].idxmax()]
+    min_total_per_city = grouped_data.loc[grouped_data.groupby('City')['Total'].idxmin()]
+    min = pd.DataFrame(min_total_per_city)
+    max = pd.DataFrame(max_total_per_city)
+
+    return render_template('store_analytic.html', table_1=table_1, table_2=table_2, 
+                            min=min.to_html(classes='table table-striped', border=0, justify='unset', col_space=0), 
+                            max=max.to_html(classes='table table-striped', border=0, justify='unset', col_space=0))
 
 
 @app.route('/ds_button')
 def ds_button():
-    return "Button 5 clicked!"
+    table_1 = df_predict.groupby('Product line')['prediction'].sum().reset_index()
+    table_2 = df_predict.groupby('Product line')['Sales'].sum().reset_index()
+    total_sales = df_predict['Sales'].sum()
+    return render_template('predict_site.html', table_1=table_1.to_html(classes='table table-striped', border=0, justify='unset', col_space=0), 
+                            table_2=table_2.to_html(classes='table table-striped', border=0, justify='unset', col_space=0),
+                            total_sales=total_sales)
 
 if __name__ == '__main__':
     app.run(debug=True)

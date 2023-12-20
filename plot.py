@@ -7,6 +7,8 @@ def preprocess_data(df, x_axis, y_axis, group_by=None, aggregation='count'):
     if isinstance(df, (pd.DatetimeIndex, pd.MultiIndex)):
         df = df.to_frame(index=False)
 
+    #S  df = df.sort_values(by='Month')
+
     # remove any pre-existing indices for ease of use in the D-Tale code, but this is not required
     df = df.reset_index().drop('index', axis=1, errors='ignore')
     df.columns = [str(c) for c in df.columns]  # update columns to strings in case they are numbers
@@ -99,6 +101,26 @@ def line_chart(df, x_axis, y_axis, aggregation='count', x_label=None, y_label=No
         'yaxis': {'title': {'text': y_label or f'{aggregation_txt} of {y_axis}'}, 'type': 'linear'}
     }))
 
+    if to_html:
+        return figure.to_html(full_html=False, config=config_plot)
+    return figure
+
+def line_chart_group(df, x_axis, y_axis, group_by, aggregation='count', x_label=None, y_label=None, title=None, to_html=True):
+    aggregation_txt = (aggregation if isinstance(aggregation, str) else aggregation.__name__).capitalize()
+
+    chart_data = preprocess_data(df, x_axis, y_axis, group_by, aggregation=aggregation)
+
+    charts = []
+    line_cfg = {'line': {'shape': 'spline', 'smoothing': 0.3}, 'mode': 'lines'}
+    charts.append(go.Scatter(
+        x=chart_data['x'], y=chart_data[f'{y_axis}||{aggregation_txt}'], name=f'({y_axis}||{aggregation_txt})', **line_cfg
+    ))
+    figure = go.Figure(data=charts, layout=go.Layout({
+        'legend': {'orientation': 'h', 'y': -0.3},
+        'title': {'text': title or f'{aggregation_txt} of {y_axis} by {x_axis}'},
+        'xaxis': {'title': {'text': x_label or x_axis}},
+        'yaxis': {'title': {'text': y_label or f'{aggregation_txt} of {y_axis}'}, 'type': 'linear'}
+    }))
     if to_html:
         return figure.to_html(full_html=False, config=config_plot)
     return figure

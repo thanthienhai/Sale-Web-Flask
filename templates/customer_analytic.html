@@ -3,14 +3,8 @@
 {% include "partials/menu.html" %}
 {%- endblock header %}
 {% block content -%}
-<style>
-	#values_goodOrPoor{
-		color: green;
-		font-weight: bold;
-	}
-</style>
 <div>
-	"Độ hài lòng của khách hàng: " <div id="values_goodOrPoor">{{data}}</div>
+	<h3 style="padding-left: 15px; padding-top: 10px; ">Mức độ hài lòng của khách hàng:  <span style="background: white; padding: 5px; color: {{ data['color'] }}; font-weight: bold;">{{ data['status'] }}</span></h3>
 </div>
 <div style="
         width: 100%;

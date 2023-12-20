@@ -3,14 +3,6 @@
 {% include "partials/menu.html" %}
 {%- endblock header %}
 {% block content -%}
-<!--
-<div style="width: 100%; height: 50%;">
-    {{ table_1|safe }}
-</div>
-<div>
-    {{ table_2|safe }}
-</div>
--->
 <style>
     .main-table {
         background-color: #f8f9fa;
@@ -56,13 +48,14 @@
     </div>
     <div style="width: 30%; height: 100%; display: table; padding-right: 15px;">
         <div style="width: 100%; height: 100%; display: table-cell; vertical-align: middle; text-align: center;">
-            <h3 style="padding-left: 15px; padding-top: 10px; ">Mức độ hài lòng của khách hàng:  <span style="color: green; font-weight: bold">{{data}}</span></h3>
+            <h3 style="padding-left: 15px; font-weight: bold">Lượng bán ít nhất: </h3>
             <div class="container-fluid mt-4 main-table">
-                {{ city_min|safe }}
+                {{ min|safe }}
             </div>
-            
+            <br>
+            <h3 style="padding-left: 15px; font-weight: bold">Lượng bán nhiều nhất: </h3>
             <div class="container-fluid mt-4 main-table">
-                {{ city_max|safe }}
+                {{ max|safe }}
             </div>
         </div>
     </div>
