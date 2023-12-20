@@ -70,8 +70,8 @@ def kh_button():
 @app.route('/tg_button')
 def tg_button():
 
-    table_1 = line_chart(df_chuanhoa.copy(), 'TimeOfTheDay', 'Total', 'mean')
-    table_2 = line_chart_group(df_chuanhoa.copy(), 'TimeOfTheDay', 'Total', 'City', 'mean')
+    table_1 = line_chart(df_chuanhoa, 'TimeOfTheDay', 'Total', aggregation='mean', x_index=['Morning', 'Afternoon', 'Evening'])
+    table_2 = line_chart(df_chuanhoa, 'TimeOfTheDay', 'Total', 'City', 'mean')
     max_index = df_chuanhoa['Total'].idxmax()
     max_time_of_the_day = df_chuanhoa.loc[max_index, 'TimeOfTheDay']
     df_chuanhoa['Time'] = pd.to_datetime(df_chuanhoa['Time'])
@@ -94,13 +94,14 @@ def tg_button():
 
 @app.route('/ch_button')
 def ch_button():
-    df_chuanhoa['Date'] = pd.to_datetime(df_chuanhoa['Date'])
-    df_chuanhoa['Month'] = df_chuanhoa['Date']
-    df_sorted = df_chuanhoa.sort_values(by='Month')
+    df_chuanhoa1=df_chuanhoa
+    df_chuanhoa1['Date'] = pd.to_datetime(df_chuanhoa1['Date'])
+    df_chuanhoa1['Month'] = df_chuanhoa1['Date']
+    df_sorted = df_chuanhoa1.sort_values(by='Month')
     df_sorted['Month'] = df_sorted['Month'].dt.month_name()
     print(df_sorted)
-    table_1 = line_chart(df_sorted.copy(), 'Month', 'Total', 'mean')
-    table_2 = bar_chart(df_origin.copy(), 'Product line', 'Total', 'City', 'mean')
+    table_1 = line_chart(df_sorted.copy(), 'Month', 'Total', aggregation='mean')
+    table_2 = bar_chart(df_origin.copy(), 'Product line', 'Total', 'City', aggregation='mean')
     #----------------------------
     grouped_data = df_origin.groupby(['City', 'Product line'])['Total'].sum().reset_index()
     max_total_per_city = grouped_data.loc[grouped_data.groupby('City')['Total'].idxmax()]
@@ -109,8 +110,8 @@ def ch_button():
     max = pd.DataFrame(max_total_per_city)
 
     return render_template('store_analytic.html', table_1=table_1, table_2=table_2, 
-                            min=min.to_html(classes='table table-striped', border=0, justify='unset', col_space=0), 
-                            max=max.to_html(classes='table table-striped', border=0, justify='unset', col_space=0))
+                            min=min.to_html(classes='table table-striped', border=0, justify='unset', col_space=0, index=False), 
+                            max=max.to_html(classes='table table-striped', border=0, justify='unset', col_space=0, index=False))
 
 
 @app.route('/ds_button')
@@ -118,8 +119,9 @@ def ds_button():
     table_1 = df_predict.groupby('Product line')['prediction'].sum().reset_index()
     table_2 = df_predict.groupby('Product line')['Sales'].sum().reset_index()
     total_sales = df_predict['Sales'].sum()
-    return render_template('predict_site.html', table_1=table_1.to_html(classes='table table-striped', border=0, justify='unset', col_space=0), 
-                            table_2=table_2.to_html(classes='table table-striped', border=0, justify='unset', col_space=0),
+    total_sales = round(total_sales, 0)
+    return render_template('predict_site.html', table_1=table_1.to_html(classes='table table-striped', border=0, justify='unset', col_space=0, index=False), 
+                            table_2=table_2.to_html(classes='table table-striped', border=0, justify='unset', col_space=0, index=False),
                             total_sales=total_sales)
 
 if __name__ == '__main__':
